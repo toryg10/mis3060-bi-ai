@@ -1,5 +1,5 @@
 # AI Usage Log
-**Assignment:**  
+**Assignment:** Homework 1 Prompt Engineering
 **Student:** Tory Gauthier  
 **Date:**  9/9/2026
 
