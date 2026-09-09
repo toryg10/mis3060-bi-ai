@@ -31,9 +31,9 @@ This strategy did a good job of explaining the important credit risk metrics in 
 ## Strategy 3 - Few-shot Strategy
 
 ### Complete Prompt
-"Example of the format I want:
-Metric 1: Customer Retention Rate
-What it measures: The percentage of customers who continue using the company over a given period.
+"Example of the format I want:  
+Metric 1: Customer Retention Rate  
+What it measures: The percentage of customers who continue using the company over a given period.  
 Why it matters: It helps a company understand customer loyalty and identify potential problems with customer satisfaction.
 
 answer this question: What are the most important metrics for measuring credit risk in a consumer loan portfolio?"
