@@ -39,14 +39,14 @@ Why it matters: It helps a company understand customer loyalty and identify pote
 answer this question: What are the most important metrics for measuring credit risk in a consumer loan portfolio?"
 
 ### First 150 Words of Claude's Response
-"Metric 1: Debt-to-Income Ratio (DTI)
-What it measures: The share of a borrower's gross monthly income that goes toward debt payments, including the loan being evaluated.
-Why it matters: A high DTI signals limited capacity to absorb a new payment obligation, making the borrower more likely to default if income drops or expenses rise.
-Metric 2: FICO / Credit Score
-What it measures: A borrower's creditworthiness based on payment history, credit utilization, length of credit history, and other bureau data.
-Why it matters: It's one of the strongest predictors of future default and lets a lender quickly segment applicants into risk tiers for pricing and approval decisions.
-Metric 3: Loan-to-Value Ratio (LTV)
-What it measures: The loan amount as a percentage of the value of the asset securing it (e.g., a car or home).
+"Metric 1: Debt-to-Income Ratio (DTI)  
+What it measures: The share of a borrower's gross monthly income that goes toward debt payments, including the loan being evaluated.  
+Why it matters: A high DTI signals limited capacity to absorb a new payment obligation, making the borrower more likely to default if income drops or expenses rise.  
+Metric 2: FICO / Credit Score  
+What it measures: A borrower's creditworthiness based on payment history, credit utilization, length of credit history, and other bureau data.  
+Why it matters: It's one of the strongest predictors of future default and lets a lender quickly segment applicants into risk tiers for pricing and approval decisions.  
+Metric 3: Loan-to-Value Ratio (LTV)  
+What it measures: The loan amount as a percentage of the value of the asset securing it (e.g., a car or home).  
 Why it matters: A high LTV means less collateral cushion, so losses in the event of default are larger; it also correlates with borrower equity and commitment to the asset."
 
 ### Evaluation
@@ -61,8 +61,8 @@ Overall, all three strategies provided useful information about credit risk, but
 ## Fact-Check
 
 ### Exact Claim from Claude
-> "Metric 1: Debt-to-Income Ratio (DTI)
-What it measures: The share of a borrower's gross monthly income that goes toward debt payments, including the loan being evaluated.
+> "Metric 1: Debt-to-Income Ratio (DTI)  
+What it measures: The share of a borrower's gross monthly income that goes toward debt payments, including the loan being evaluated.  
 Why it matters: A high DTI signals limited capacity to absorb a new payment obligation, making the borrower more likely to default if income drops or expenses rise."
 
 ### Source
