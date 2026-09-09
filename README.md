@@ -1,7 +1,7 @@
 # MIS3060 Business Intelligence with AI
 Villanova School of Business — Fall 2026
 
-**Student:** Tory Gauthier
+**Student:** Tory Gauthier  
 **GitHub:** toryg10
 
 ## About This Repository
