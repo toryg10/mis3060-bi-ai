@@ -1,0 +1,142 @@
+stage,section,kind,table,check,checked,passed,failed,pass_pct,note
+raw,referential integrity,foreign key,dim_client,dim_client.advisor_id -> dim_advisor.advisor_id,2525.0,2525.0,0.0,100.0,null-key rate 0.00%; 0 distinct orphan keys; dimension key unique: True
+raw,referential integrity,foreign key,dim_security,dim_security.benchmark_id -> dim_benchmark.benchmark_id,500.0,500.0,0.0,100.0,null-key rate 0.00%; 0 distinct orphan keys; dimension key unique: True
+raw,referential integrity,foreign key,fact_fees,fact_fees.client_id -> dim_client.client_id,122197.0,122197.0,0.0,100.0,null-key rate 0.00%; 0 distinct orphan keys; dimension key unique: True
+raw,referential integrity,foreign key,fact_fees,fact_fees.advisor_id -> dim_advisor.advisor_id,122197.0,122197.0,0.0,100.0,null-key rate 0.00%; 0 distinct orphan keys; dimension key unique: True
+raw,referential integrity,foreign key,fact_portfolio_snapshot,fact_portfolio_snapshot.client_id -> dim_client.client_id,129547.0,129547.0,0.0,100.0,null-key rate 0.00%; 0 distinct orphan keys; dimension key unique: True
+raw,referential integrity,foreign key,fact_portfolio_snapshot,fact_portfolio_snapshot.advisor_id -> dim_advisor.advisor_id,129547.0,129547.0,0.0,100.0,null-key rate 0.00%; 0 distinct orphan keys; dimension key unique: True
+raw,referential integrity,foreign key,fact_portfolio_snapshot,fact_portfolio_snapshot.benchmark_id -> dim_benchmark.benchmark_id,129547.0,129547.0,0.0,100.0,null-key rate 0.00%; 0 distinct orphan keys; dimension key unique: True
+raw,referential integrity,foreign key,fact_transactions,fact_transactions.client_id -> dim_client.client_id,298772.0,298572.0,200.0,99.93,null-key rate 0.00%; 200 distinct orphan keys; dimension key unique: True
+raw,referential integrity,foreign key,fact_transactions,fact_transactions.advisor_id -> dim_advisor.advisor_id,298772.0,298772.0,0.0,100.0,null-key rate 0.00%; 0 distinct orphan keys; dimension key unique: True
+raw,referential integrity,foreign key,fact_transactions,fact_transactions.security_id -> dim_security.security_id,197175.0,0.0,197175.0,0.0,null-key rate 34.00%; 500 distinct orphan keys; dimension key unique: True
+raw,referential integrity,foreign key,fact_fees,fact_fees.fee_date -> dim_date.date,122197.0,122197.0,0.0,100.0,null-key rate 0.00%; 0 distinct orphan keys; dimension key unique: True
+raw,referential integrity,foreign key,fact_portfolio_snapshot,fact_portfolio_snapshot.snapshot_date -> dim_date.date,129547.0,129547.0,0.0,100.0,null-key rate 0.00%; 0 distinct orphan keys; dimension key unique: True
+raw,referential integrity,foreign key,fact_transactions,fact_transactions.txn_date -> dim_date.date,298772.0,298772.0,0.0,100.0,null-key rate 0.00%; 0 distinct orphan keys; dimension key unique: True
+raw,rule,code list,dim_advisor,allowed values: region,25.0,25.0,0.0,100.0,
+raw,rule,code list,dim_benchmark,allowed values: asset_class,8.0,8.0,0.0,100.0,
+raw,rule,code list,dim_client,allowed values: state,2525.0,2447.0,78.0,96.91,
+raw,rule,code list,dim_client,allowed values: risk_profile,2449.0,2449.0,0.0,100.0,
+raw,rule,code list,dim_client,allowed values: client_tier,2525.0,2525.0,0.0,100.0,
+raw,rule,code list,dim_client,allowed values: primary_account_type,2525.0,2525.0,0.0,100.0,
+raw,rule,code list,dim_security,allowed values: asset_class,500.0,500.0,0.0,100.0,
+raw,rule,code list,dim_security,allowed values: sector,281.0,281.0,0.0,100.0,
+raw,rule,code list,fact_fees,allowed values: fee_type,122197.0,122197.0,0.0,100.0,
+raw,rule,code list,fact_transactions,allowed values: txn_type,298772.0,298772.0,0.0,100.0,
+raw,rule,code list,fact_portfolio_snapshot,allowed values: account_type,129547.0,129547.0,0.0,100.0,
+raw,rule,code list,dim_date,allowed values: month_name,1827.0,1827.0,0.0,100.0,
+raw,rule,code list,dim_date,allowed values: day_of_week,1827.0,1827.0,0.0,100.0,
+raw,rule,bound,dim_advisor,"range years_experience in [0, 60]",25.0,25.0,0.0,100.0,
+raw,rule,bound,dim_advisor,"range aum_target_mm in [0.01, None]",25.0,25.0,0.0,100.0,
+raw,rule,bound,dim_client,"range age in [18, 110]",2525.0,2525.0,0.0,100.0,
+raw,rule,bound,dim_client,"range initial_aum in [0.01, None]",2525.0,2525.0,0.0,100.0,
+raw,rule,bound,dim_date,"range year in [2020, 2024]",1827.0,1827.0,0.0,100.0,
+raw,rule,bound,dim_date,"range quarter in [1, 4]",1827.0,1827.0,0.0,100.0,
+raw,rule,bound,dim_date,"range month in [1, 12]",1827.0,1827.0,0.0,100.0,
+raw,rule,bound,dim_date,"range week_of_year in [1, 53]",1827.0,1827.0,0.0,100.0,
+raw,rule,bound,dim_security,"range expense_ratio_bps in [0, 300]",219.0,219.0,0.0,100.0,
+raw,rule,bound,fact_fees,"range aum_basis in [0.01, None]",122197.0,122197.0,0.0,100.0,
+raw,rule,bound,fact_fees,"range bps_charged in [0, 100]",122197.0,122196.0,1.0,100.0,
+raw,rule,bound,fact_fees,"range amount in [0.01, None]",122197.0,122197.0,0.0,100.0,
+raw,rule,bound,fact_portfolio_snapshot,"range year in [2020, 2024]",129547.0,129547.0,0.0,100.0,
+raw,rule,bound,fact_portfolio_snapshot,"range month in [1, 12]",129547.0,129547.0,0.0,100.0,
+raw,rule,bound,fact_portfolio_snapshot,"range aum in [0.01, None]",129547.0,129547.0,0.0,100.0,
+raw,rule,bound,fact_portfolio_snapshot,"range cash_pct in [0, 1]",129547.0,129547.0,0.0,100.0,
+raw,rule,bound,fact_portfolio_snapshot,"range return_ytd in [-1, None]",129247.0,129247.0,0.0,100.0,
+raw,rule,bound,fact_portfolio_snapshot,"range benchmark_return_ytd in [-1, None]",129547.0,129547.0,0.0,100.0,
+raw,rule,bound,fact_transactions,"range price in [0.01, None]",197175.0,197175.0,0.0,100.0,
+raw,rule,bound,fact_transactions,"range amount in [0.01, None]",298772.0,298772.0,0.0,100.0,
+raw,rule,bound,dim_client,"date client_since in [1990-01-01, 2024-12-31]",2525.0,2525.0,0.0,100.0,
+raw,rule,sign,fact_transactions,Buy/Sell shares > 0,143311.0,142475.0,836.0,99.42,
+raw,rule,sign,fact_transactions,Dividend shares > 0,53864.0,53864.0,0.0,100.0,
+raw,rule,recompute,fact_transactions,Buy/Sell amount = |shares| x price,143311.0,143311.0,0.0,100.0,
+raw,rule,structure,fact_transactions,trade rows have a security,197175.0,197175.0,0.0,100.0,
+raw,rule,structure,fact_transactions,cash rows have no security,101597.0,101597.0,0.0,100.0,
+raw,rule,recompute,fact_fees,amount = aum_basis x bps / 10000 / 12,122197.0,122197.0,0.0,100.0,
+raw,rule,recompute,fact_portfolio_snapshot,alpha = return - benchmark,129247.0,129247.0,0.0,100.0,
+raw,rule,recompute,fact_portfolio_snapshot,year/month match snapshot_date,129547.0,129547.0,0.0,100.0,
+raw,rule,recompute,dim_date,calendar columns match date,1827.0,1827.0,0.0,100.0,
+raw,rule,structure,dim_date,weekends are not trading days,522.0,522.0,0.0,100.0,
+raw,rule,structure,dim_security,"ETF: no sector, has expense ratio",219.0,219.0,0.0,100.0,
+raw,rule,structure,dim_security,"non-ETF: has sector, no expense ratio",281.0,281.0,0.0,100.0,
+raw,rule,plausibility,fact_transactions,Dividend is not the whole position value (D8),53864.0,0.0,53864.0,0.0,
+raw,rule,plausibility,fact_portfolio_snapshot,return_ytd <= +100% (D9),129247.0,128271.0,976.0,99.24,
+raw,rule,plausibility,fact_portfolio_snapshot,"aum not at the $1,000 floor (D10)",129547.0,129127.0,420.0,99.68,
+raw,rule,plausibility,fact_fees,"aum_basis not at the $1,000 floor (D10)",122197.0,121811.0,386.0,99.68,
+raw,rule,plausibility,fact_transactions,Buy/Sell on a trading day (D11),143311.0,102662.0,40649.0,71.64,
+raw,reconciliation,reconciliation,fact_fees,"R1 aum_basis = snapshot aum (same client, month)",122197.0,122197.0,0.0,100.0,
+raw,reconciliation,reconciliation,fact_fees,R2 advisor_id = client's advisor in dim_client,122197.0,122197.0,0.0,100.0,
+raw,reconciliation,reconciliation,fact_portfolio_snapshot,R2 advisor_id = client's advisor in dim_client,129547.0,129547.0,0.0,100.0,
+raw,reconciliation,reconciliation,fact_transactions,R2 advisor_id = client's advisor in dim_client,298572.0,298572.0,0.0,100.0,
+raw,reconciliation,reconciliation,fact_portfolio_snapshot,R3 account_type = client's primary_account_type,129547.0,129547.0,0.0,100.0,
+raw,reconciliation,reconciliation,fact_portfolio_snapshot,R4 benchmark matches stated risk profile,125605.0,125605.0,0.0,100.0,
+clean,referential integrity,foreign key,dim_client,dim_client.advisor_id -> dim_advisor.advisor_id,2500.0,2500.0,0.0,100.0,null-key rate 0.00%; 0 distinct orphan keys; dimension key unique: True
+clean,referential integrity,foreign key,dim_security,dim_security.benchmark_id -> dim_benchmark.benchmark_id,500.0,500.0,0.0,100.0,null-key rate 0.00%; 0 distinct orphan keys; dimension key unique: True
+clean,referential integrity,foreign key,fact_fees,fact_fees.client_id -> dim_client.client_id,122197.0,122197.0,0.0,100.0,null-key rate 0.00%; 0 distinct orphan keys; dimension key unique: True
+clean,referential integrity,foreign key,fact_fees,fact_fees.advisor_id -> dim_advisor.advisor_id,122197.0,122197.0,0.0,100.0,null-key rate 0.00%; 0 distinct orphan keys; dimension key unique: True
+clean,referential integrity,foreign key,fact_portfolio_snapshot,fact_portfolio_snapshot.client_id -> dim_client.client_id,129547.0,129547.0,0.0,100.0,null-key rate 0.00%; 0 distinct orphan keys; dimension key unique: True
+clean,referential integrity,foreign key,fact_portfolio_snapshot,fact_portfolio_snapshot.advisor_id -> dim_advisor.advisor_id,129547.0,129547.0,0.0,100.0,null-key rate 0.00%; 0 distinct orphan keys; dimension key unique: True
+clean,referential integrity,foreign key,fact_portfolio_snapshot,fact_portfolio_snapshot.benchmark_id -> dim_benchmark.benchmark_id,129547.0,129547.0,0.0,100.0,null-key rate 0.00%; 0 distinct orphan keys; dimension key unique: True
+clean,referential integrity,foreign key,fact_transactions,fact_transactions.client_id -> dim_client.client_id,298572.0,298572.0,0.0,100.0,null-key rate 0.00%; 0 distinct orphan keys; dimension key unique: True
+clean,referential integrity,foreign key,fact_transactions,fact_transactions.advisor_id -> dim_advisor.advisor_id,298572.0,298572.0,0.0,100.0,null-key rate 0.00%; 0 distinct orphan keys; dimension key unique: True
+clean,referential integrity,foreign key,fact_transactions,fact_transactions.security_id -> dim_security.security_id,197044.0,197044.0,0.0,100.0,null-key rate 34.00%; 0 distinct orphan keys; dimension key unique: True
+clean,referential integrity,foreign key,fact_fees,fact_fees.fee_date -> dim_date.date,122197.0,122197.0,0.0,100.0,null-key rate 0.00%; 0 distinct orphan keys; dimension key unique: True
+clean,referential integrity,foreign key,fact_portfolio_snapshot,fact_portfolio_snapshot.snapshot_date -> dim_date.date,129547.0,129547.0,0.0,100.0,null-key rate 0.00%; 0 distinct orphan keys; dimension key unique: True
+clean,referential integrity,foreign key,fact_transactions,fact_transactions.txn_date -> dim_date.date,298572.0,298572.0,0.0,100.0,null-key rate 0.00%; 0 distinct orphan keys; dimension key unique: True
+clean,rule,code list,dim_advisor,allowed values: region,25.0,25.0,0.0,100.0,
+clean,rule,code list,dim_benchmark,allowed values: asset_class,8.0,8.0,0.0,100.0,
+clean,rule,code list,dim_client,allowed values: state,2500.0,2500.0,0.0,100.0,
+clean,rule,code list,dim_client,allowed values: risk_profile,2500.0,2500.0,0.0,100.0,
+clean,rule,code list,dim_client,allowed values: client_tier,2500.0,2500.0,0.0,100.0,
+clean,rule,code list,dim_client,allowed values: primary_account_type,2500.0,2500.0,0.0,100.0,
+clean,rule,code list,dim_security,allowed values: asset_class,500.0,500.0,0.0,100.0,
+clean,rule,code list,dim_security,allowed values: sector,281.0,281.0,0.0,100.0,
+clean,rule,code list,fact_fees,allowed values: fee_type,122197.0,122197.0,0.0,100.0,
+clean,rule,code list,fact_transactions,allowed values: txn_type,298572.0,298572.0,0.0,100.0,
+clean,rule,code list,fact_portfolio_snapshot,allowed values: account_type,129547.0,129547.0,0.0,100.0,
+clean,rule,code list,dim_date,allowed values: month_name,1827.0,1827.0,0.0,100.0,
+clean,rule,code list,dim_date,allowed values: day_of_week,1827.0,1827.0,0.0,100.0,
+clean,rule,bound,dim_advisor,"range years_experience in [0, 60]",25.0,25.0,0.0,100.0,
+clean,rule,bound,dim_advisor,"range aum_target_mm in [0.01, None]",25.0,25.0,0.0,100.0,
+clean,rule,bound,dim_client,"range age in [18, 110]",2500.0,2500.0,0.0,100.0,
+clean,rule,bound,dim_client,"range initial_aum in [0.01, None]",2500.0,2500.0,0.0,100.0,
+clean,rule,bound,dim_date,"range year in [2020, 2024]",1827.0,1827.0,0.0,100.0,
+clean,rule,bound,dim_date,"range quarter in [1, 4]",1827.0,1827.0,0.0,100.0,
+clean,rule,bound,dim_date,"range month in [1, 12]",1827.0,1827.0,0.0,100.0,
+clean,rule,bound,dim_date,"range week_of_year in [1, 53]",1827.0,1827.0,0.0,100.0,
+clean,rule,bound,dim_security,"range expense_ratio_bps in [0, 300]",219.0,219.0,0.0,100.0,
+clean,rule,bound,fact_fees,"range aum_basis in [0.01, None]",122197.0,122197.0,0.0,100.0,
+clean,rule,bound,fact_fees,"range bps_charged in [0, 100]",122197.0,122196.0,1.0,100.0,
+clean,rule,bound,fact_fees,"range amount in [0.01, None]",122197.0,122197.0,0.0,100.0,
+clean,rule,bound,fact_portfolio_snapshot,"range year in [2020, 2024]",129547.0,129547.0,0.0,100.0,
+clean,rule,bound,fact_portfolio_snapshot,"range month in [1, 12]",129547.0,129547.0,0.0,100.0,
+clean,rule,bound,fact_portfolio_snapshot,"range aum in [0.01, None]",129547.0,129547.0,0.0,100.0,
+clean,rule,bound,fact_portfolio_snapshot,"range cash_pct in [0, 1]",129547.0,129547.0,0.0,100.0,
+clean,rule,bound,fact_portfolio_snapshot,"range return_ytd in [-1, None]",129547.0,129547.0,0.0,100.0,
+clean,rule,bound,fact_portfolio_snapshot,"range benchmark_return_ytd in [-1, None]",129547.0,129547.0,0.0,100.0,
+clean,rule,bound,fact_transactions,"range price in [0.01, None]",197044.0,197044.0,0.0,100.0,
+clean,rule,bound,fact_transactions,"range amount in [0.01, None]",298572.0,298572.0,0.0,100.0,
+clean,rule,bound,dim_client,"date client_since in [1990-01-01, 2024-12-31]",2500.0,2500.0,0.0,100.0,
+clean,rule,sign,fact_transactions,Buy/Sell shares > 0,143218.0,143218.0,0.0,100.0,
+clean,rule,sign,fact_transactions,Dividend shares > 0,53826.0,53826.0,0.0,100.0,
+clean,rule,recompute,fact_transactions,Buy/Sell amount = |shares| x price,143218.0,143218.0,0.0,100.0,
+clean,rule,structure,fact_transactions,trade rows have a security,197044.0,197044.0,0.0,100.0,
+clean,rule,structure,fact_transactions,cash rows have no security,101528.0,101528.0,0.0,100.0,
+clean,rule,recompute,fact_fees,amount = aum_basis x bps / 10000 / 12,122197.0,122197.0,0.0,100.0,
+clean,rule,recompute,fact_portfolio_snapshot,alpha = return - benchmark,129547.0,129547.0,0.0,100.0,
+clean,rule,recompute,fact_portfolio_snapshot,year/month match snapshot_date,129547.0,129547.0,0.0,100.0,
+clean,rule,recompute,dim_date,calendar columns match date,1827.0,1827.0,0.0,100.0,
+clean,rule,structure,dim_date,weekends are not trading days,522.0,522.0,0.0,100.0,
+clean,rule,structure,dim_security,"ETF: no sector, has expense ratio",219.0,219.0,0.0,100.0,
+clean,rule,structure,dim_security,"non-ETF: has sector, no expense ratio",281.0,281.0,0.0,100.0,
+clean,rule,plausibility,fact_transactions,Dividend is not the whole position value (D8),53826.0,0.0,53826.0,0.0,
+clean,rule,plausibility,fact_portfolio_snapshot,return_ytd <= +100% (D9),129547.0,128570.0,977.0,99.25,
+clean,rule,plausibility,fact_portfolio_snapshot,"aum not at the $1,000 floor (D10)",129547.0,129127.0,420.0,99.68,
+clean,rule,plausibility,fact_fees,"aum_basis not at the $1,000 floor (D10)",122197.0,121811.0,386.0,99.68,
+clean,rule,plausibility,fact_transactions,Buy/Sell on a trading day (D11),143218.0,102588.0,40630.0,71.63,
+clean,reconciliation,reconciliation,fact_fees,"R1 aum_basis = snapshot aum (same client, month)",122197.0,122197.0,0.0,100.0,
+clean,reconciliation,reconciliation,fact_fees,R2 advisor_id = client's advisor in dim_client,122197.0,122197.0,0.0,100.0,
+clean,reconciliation,reconciliation,fact_portfolio_snapshot,R2 advisor_id = client's advisor in dim_client,129547.0,129547.0,0.0,100.0,
+clean,reconciliation,reconciliation,fact_transactions,R2 advisor_id = client's advisor in dim_client,298572.0,298572.0,0.0,100.0,
+clean,reconciliation,reconciliation,fact_portfolio_snapshot,R3 account_type = client's primary_account_type,129547.0,129547.0,0.0,100.0,
+clean,reconciliation,reconciliation,fact_portfolio_snapshot,R4 benchmark matches stated risk profile,125605.0,125605.0,0.0,100.0,
+clean,iqr interpretation,,dim_client / fact_transactions,does flagged mean wrong?,,,,,"Flagged does not mean wrong (all 251 high initial_aum outliers are UHNW clients, who should be large), and unflagged does not mean right (53,275 of the 53,826 dividends that equal the whole position sit inside the IQR fences; the D8 plausibility rule finds them, the outlier screen does not)."
