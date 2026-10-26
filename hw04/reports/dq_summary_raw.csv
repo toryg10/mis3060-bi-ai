@@ -1,0 +1,474 @@
+severity,group,table,column,check,rows_failed,rows_checked,pct_failed,example,note
+ERROR,1 Column level,dim_client,state,Validity: value not in allowed list,78,2525,3.09,Pennsylvania; Florida; New York,
+ERROR,1 Column level,fact_portfolio_snapshot,return_ytd,Type: values not parseable as float,300,129547,0.23,9.28%; 19.52%; 13.35%,
+ERROR,1 Column level,fact_transactions,security_id,Type: ID not stored as integer text,197175,197175,100.0,45.0; 174.0; 478.0,e.g. '45.0' will not join to '45'
+ERROR,1 Column level,fact_transactions,shares,"Range: outside [0.0001, None]",836,197175,0.42,-261.9719; -338.0946; -360.8407,
+ERROR,2 Single-table,fact_transactions,shares,Sign: Buy/Sell with zero or negative shares,836,143311,0.58,Buy -261.9719; Buy -338.0946; Buy -360.8407,
+ERROR,2 Single-table,fact_transactions,amount,Plausibility: Dividend amount equals the full position value (shares x price),53864,53864,100.0,67311.33; 76811.96; 23678.26,"A dividend is a small yield on the position, not the position's value"
+ERROR,3 Referential integrity,fact_transactions,client_id,Join breaks on raw text -> dim_client.client_id,200,298772,0.07,3191; 3017; 3058,Raw text does not match the dimension key exactly
+ERROR,3 Referential integrity,fact_transactions,client_id,Orphans: no matching dim_client.client_id (after normalizing),200,298772,0.07,3191; 3017; 3058,
+ERROR,3 Referential integrity,fact_transactions,security_id,Join breaks on raw text -> dim_security.security_id,197175,197175,100.0,45.0; 174.0; 478.0,Raw text does not match the dimension key exactly
+WARN,1 Column level,fact_fees,aum_basis,Plausibility: rows piled at the minimum,386,122197,0.32,minimum = 1000.0,A near-unique column should not repeat its edge value; placeholder or floor?
+WARN,1 Column level,fact_fees,bps_charged,"Range: outside [0, 100]",1,122197,0.0,100.38,Above 100 bps (1%/yr) is unusual for advisory fees
+WARN,1 Column level,fact_portfolio_snapshot,aum,Plausibility: rows piled at the minimum,420,129547,0.32,minimum = 1000.0,A near-unique column should not repeat its edge value; placeholder or floor?
+WARN,1 Column level,fact_portfolio_snapshot,return_ytd,Range: return above +1 (+100%),976,129247,0.76,2.872312; 2.946391; 2.885055,"Possible percent units mixed with decimals (compare the '12.34%' strings), or flows counted as return"
+WARN,2 Single-table,dim_client,last_name,Near-duplicates: rows identical except 'last_name',50,2525,1.98,99=Jacobson; 155=Cooper; 560=Cervantes,Same entity entered twice with one field changed? Or a coincidence?
+WARN,2 Single-table,fact_fees,fee_date,Near-duplicates: rows identical except 'fee_date',2,122197,0.0,57446=2020-06-01; 57490=2024-04-01,Same entity entered twice with one field changed? Or a coincidence?
+WARN,2 Single-table,fact_transactions,client_id,Near-duplicates: rows identical except 'client_id',400,298772,0.13,1798=16; 2717=24; 2718=24,Same entity entered twice with one field changed? Or a coincidence?
+WARN,2 Single-table,fact_transactions,txn_date,Near-duplicates: rows identical except 'txn_date',14,298772,0.0,43968=2022-09-04; 43992=2022-06-18; 93981=2021-04-01,Same entity entered twice with one field changed? Or a coincidence?
+WARN,2 Single-table,fact_transactions,amount,Near-duplicates: rows identical except 'amount',1050,298772,0.35,25=94893.52; 136=26587.27; 1214=69066.71,Same entity entered twice with one field changed? Or a coincidence?
+WARN,4 Cross-table,fact_transactions,txn_date,Buy/Sell dated on a non-trading day,40649,143311,28.36,2020-10-25; 2022-01-02; 2020-05-03,
+INFO,1 Column level,dim_advisor,certifications,Completeness: null-like text,6,25,24.0,None,"May mean 'missing', or may be a real value"
+INFO,1 Column level,dim_client,risk_profile,Completeness: blank cells,76,2525,3.01,,"Decide: defect, or legitimate structure (blank by design)?"
+INFO,1 Column level,dim_security,sector,Completeness: blank cells,219,500,43.8,,"Decide: defect, or legitimate structure (blank by design)?"
+INFO,1 Column level,dim_security,expense_ratio_bps,Completeness: blank cells,281,500,56.2,,"Decide: defect, or legitimate structure (blank by design)?"
+INFO,1 Column level,fact_transactions,security_id,Completeness: blank cells,101597,298772,34.0,,"Decide: defect, or legitimate structure (blank by design)?"
+INFO,1 Column level,fact_transactions,shares,Completeness: blank cells,101597,298772,34.0,,"Decide: defect, or legitimate structure (blank by design)?"
+INFO,1 Column level,fact_transactions,price,Completeness: blank cells,101597,298772,34.0,,"Decide: defect, or legitimate structure (blank by design)?"
+INFO,3 Referential integrity,fact_transactions,security_id,Null key -> dim_security.security_id,101597,298772,34.0,,Blank FK: check whether it is structural
+INFO,4 Cross-table,dim_client,client_id,"Client has no fees, snapshots or transactions",25,2525,0.99,2501; 2502; 2503,
+INFO,4 Cross-table,fact_transactions,shares,Sell leaves a negative running position,43010,59755,71.98,,"Data has no opening positions, so this cannot prove an error on its own"
+PASS,1 Column level,dim_advisor,advisor_id,Type: values not parseable as int,0,25,0.0,,
+PASS,1 Column level,dim_advisor,advisor_id,Type: ID not stored as integer text,0,25,0.0,,e.g. '45.0' will not join to '45'
+PASS,1 Column level,dim_advisor,advisor_id,Format: leading/trailing/double spaces,0,25,0.0,,
+PASS,1 Column level,dim_advisor,advisor_id,Format: same value in different case/spacing,0,25,0.0,,
+PASS,1 Column level,dim_advisor,first_name,Type: values not parseable as text,0,25,0.0,,
+PASS,1 Column level,dim_advisor,first_name,Format: leading/trailing/double spaces,0,25,0.0,,
+PASS,1 Column level,dim_advisor,first_name,Format: same value in different case/spacing,0,24,0.0,,
+PASS,1 Column level,dim_advisor,last_name,Type: values not parseable as text,0,25,0.0,,
+PASS,1 Column level,dim_advisor,last_name,Format: leading/trailing/double spaces,0,25,0.0,,
+PASS,1 Column level,dim_advisor,last_name,Format: same value in different case/spacing,0,24,0.0,,
+PASS,1 Column level,dim_advisor,region,Type: values not parseable as text,0,25,0.0,,
+PASS,1 Column level,dim_advisor,region,Format: leading/trailing/double spaces,0,25,0.0,,
+PASS,1 Column level,dim_advisor,region,Format: same value in different case/spacing,0,5,0.0,,
+PASS,1 Column level,dim_advisor,years_experience,Type: values not parseable as int,0,25,0.0,,
+PASS,1 Column level,dim_advisor,years_experience,Format: leading/trailing/double spaces,0,25,0.0,,
+PASS,1 Column level,dim_advisor,years_experience,Format: same value in different case/spacing,0,17,0.0,,
+PASS,1 Column level,dim_advisor,aum_target_mm,Type: values not parseable as int,0,25,0.0,,
+PASS,1 Column level,dim_advisor,aum_target_mm,Format: leading/trailing/double spaces,0,25,0.0,,
+PASS,1 Column level,dim_advisor,aum_target_mm,Format: same value in different case/spacing,0,5,0.0,,
+PASS,1 Column level,dim_advisor,certifications,Type: values not parseable as text,0,19,0.0,,
+PASS,1 Column level,dim_advisor,certifications,Format: leading/trailing/double spaces,0,25,0.0,,
+PASS,1 Column level,dim_advisor,certifications,Format: same value in different case/spacing,0,5,0.0,,
+PASS,1 Column level,dim_advisor,advisor_id,Key: primary key blank,0,25,0.0,,
+PASS,1 Column level,dim_advisor,advisor_id,Key: primary key not unique,0,25,0.0,,
+PASS,1 Column level,dim_advisor,region,Validity: value not in allowed list,0,25,0.0,,
+PASS,1 Column level,dim_advisor,years_experience,"Range: outside [0, 60]",0,25,0.0,,
+PASS,1 Column level,dim_advisor,aum_target_mm,"Range: outside [0.01, None]",0,25,0.0,,
+PASS,1 Column level,dim_benchmark,benchmark_id,Type: values not parseable as int,0,8,0.0,,
+PASS,1 Column level,dim_benchmark,benchmark_id,Type: ID not stored as integer text,0,8,0.0,,e.g. '45.0' will not join to '45'
+PASS,1 Column level,dim_benchmark,benchmark_id,Format: leading/trailing/double spaces,0,8,0.0,,
+PASS,1 Column level,dim_benchmark,benchmark_id,Format: same value in different case/spacing,0,8,0.0,,
+PASS,1 Column level,dim_benchmark,name,Type: values not parseable as text,0,8,0.0,,
+PASS,1 Column level,dim_benchmark,name,Format: leading/trailing/double spaces,0,8,0.0,,
+PASS,1 Column level,dim_benchmark,name,Format: same value in different case/spacing,0,8,0.0,,
+PASS,1 Column level,dim_benchmark,asset_class,Type: values not parseable as text,0,8,0.0,,
+PASS,1 Column level,dim_benchmark,asset_class,Format: leading/trailing/double spaces,0,8,0.0,,
+PASS,1 Column level,dim_benchmark,asset_class,Format: same value in different case/spacing,0,7,0.0,,
+PASS,1 Column level,dim_benchmark,ticker_proxy,Type: values not parseable as text,0,8,0.0,,
+PASS,1 Column level,dim_benchmark,ticker_proxy,Format: leading/trailing/double spaces,0,8,0.0,,
+PASS,1 Column level,dim_benchmark,ticker_proxy,Format: same value in different case/spacing,0,8,0.0,,
+PASS,1 Column level,dim_benchmark,benchmark_id,Key: primary key blank,0,8,0.0,,
+PASS,1 Column level,dim_benchmark,benchmark_id,Key: primary key not unique,0,8,0.0,,
+PASS,1 Column level,dim_benchmark,ticker_proxy,Key: natural key not unique,0,8,0.0,,
+PASS,1 Column level,dim_benchmark,asset_class,Validity: value not in allowed list,0,8,0.0,,
+PASS,1 Column level,dim_client,client_id,Type: values not parseable as int,0,2525,0.0,,
+PASS,1 Column level,dim_client,client_id,Type: ID not stored as integer text,0,2525,0.0,,e.g. '45.0' will not join to '45'
+PASS,1 Column level,dim_client,client_id,Format: leading/trailing/double spaces,0,2525,0.0,,
+PASS,1 Column level,dim_client,client_id,Format: same value in different case/spacing,0,2525,0.0,,
+PASS,1 Column level,dim_client,client_id,Plausibility: rows piled at the minimum,0,2525,0.0,minimum = 1,A near-unique column should not repeat its edge value; placeholder or floor?
+PASS,1 Column level,dim_client,client_id,Plausibility: rows piled at the maximum,0,2525,0.0,maximum = 2525,A near-unique column should not repeat its edge value; placeholder or floor?
+PASS,1 Column level,dim_client,first_name,Type: values not parseable as text,0,2525,0.0,,
+PASS,1 Column level,dim_client,first_name,Format: leading/trailing/double spaces,0,2525,0.0,,
+PASS,1 Column level,dim_client,first_name,Format: same value in different case/spacing,0,505,0.0,,
+PASS,1 Column level,dim_client,last_name,Type: values not parseable as text,0,2525,0.0,,
+PASS,1 Column level,dim_client,last_name,Format: leading/trailing/double spaces,0,2525,0.0,,
+PASS,1 Column level,dim_client,last_name,Format: same value in different case/spacing,0,778,0.0,,
+PASS,1 Column level,dim_client,age,Type: values not parseable as int,0,2525,0.0,,
+PASS,1 Column level,dim_client,age,Format: leading/trailing/double spaces,0,2525,0.0,,
+PASS,1 Column level,dim_client,age,Format: same value in different case/spacing,0,53,0.0,,
+PASS,1 Column level,dim_client,city,Type: values not parseable as text,0,2525,0.0,,
+PASS,1 Column level,dim_client,city,Format: leading/trailing/double spaces,0,2525,0.0,,
+PASS,1 Column level,dim_client,city,Format: same value in different case/spacing,0,2291,0.0,,
+PASS,1 Column level,dim_client,state,Type: values not parseable as text,0,2525,0.0,,
+PASS,1 Column level,dim_client,state,Format: leading/trailing/double spaces,0,2525,0.0,,
+PASS,1 Column level,dim_client,state,Format: same value in different case/spacing,0,27,0.0,,
+PASS,1 Column level,dim_client,zip_code,Type: values not parseable as int,0,2525,0.0,,
+PASS,1 Column level,dim_client,zip_code,Format: leading/trailing/double spaces,0,2525,0.0,,
+PASS,1 Column level,dim_client,zip_code,Format: same value in different case/spacing,0,2483,0.0,,
+PASS,1 Column level,dim_client,zip_code,Plausibility: rows piled at the minimum,0,2525,0.0,minimum = 533,A near-unique column should not repeat its edge value; placeholder or floor?
+PASS,1 Column level,dim_client,zip_code,Plausibility: rows piled at the maximum,0,2525,0.0,maximum = 99822,A near-unique column should not repeat its edge value; placeholder or floor?
+PASS,1 Column level,dim_client,risk_profile,Type: values not parseable as text,0,2449,0.0,,
+PASS,1 Column level,dim_client,risk_profile,Format: leading/trailing/double spaces,0,2449,0.0,,
+PASS,1 Column level,dim_client,risk_profile,Format: same value in different case/spacing,0,5,0.0,,
+PASS,1 Column level,dim_client,client_tier,Type: values not parseable as text,0,2525,0.0,,
+PASS,1 Column level,dim_client,client_tier,Format: leading/trailing/double spaces,0,2525,0.0,,
+PASS,1 Column level,dim_client,client_tier,Format: same value in different case/spacing,0,3,0.0,,
+PASS,1 Column level,dim_client,primary_account_type,Type: values not parseable as text,0,2525,0.0,,
+PASS,1 Column level,dim_client,primary_account_type,Format: leading/trailing/double spaces,0,2525,0.0,,
+PASS,1 Column level,dim_client,primary_account_type,Format: same value in different case/spacing,0,5,0.0,,
+PASS,1 Column level,dim_client,initial_aum,Type: values not parseable as float,0,2525,0.0,,
+PASS,1 Column level,dim_client,initial_aum,Format: leading/trailing/double spaces,0,2525,0.0,,
+PASS,1 Column level,dim_client,initial_aum,Format: same value in different case/spacing,0,2500,0.0,,
+PASS,1 Column level,dim_client,initial_aum,Plausibility: rows piled at the minimum,0,2525,0.0,minimum = 50016.07,A near-unique column should not repeat its edge value; placeholder or floor?
+PASS,1 Column level,dim_client,initial_aum,Plausibility: rows piled at the maximum,0,2525,0.0,maximum = 49901583.57,A near-unique column should not repeat its edge value; placeholder or floor?
+PASS,1 Column level,dim_client,client_since,Type: values not parseable as date,0,2525,0.0,,
+PASS,1 Column level,dim_client,client_since,Format: leading/trailing/double spaces,0,2525,0.0,,
+PASS,1 Column level,dim_client,client_since,Format: same value in different case/spacing,0,1651,0.0,,
+PASS,1 Column level,dim_client,advisor_id,Type: values not parseable as int,0,2525,0.0,,
+PASS,1 Column level,dim_client,advisor_id,Type: ID not stored as integer text,0,2525,0.0,,e.g. '45.0' will not join to '45'
+PASS,1 Column level,dim_client,advisor_id,Format: leading/trailing/double spaces,0,2525,0.0,,
+PASS,1 Column level,dim_client,advisor_id,Format: same value in different case/spacing,0,25,0.0,,
+PASS,1 Column level,dim_client,is_active,Type: values not parseable as bool,0,2525,0.0,,
+PASS,1 Column level,dim_client,is_active,Format: leading/trailing/double spaces,0,2525,0.0,,
+PASS,1 Column level,dim_client,is_active,Format: same value in different case/spacing,0,2,0.0,,
+PASS,1 Column level,dim_client,client_id,Key: primary key blank,0,2525,0.0,,
+PASS,1 Column level,dim_client,client_id,Key: primary key not unique,0,2525,0.0,,
+PASS,1 Column level,dim_client,risk_profile,Validity: value not in allowed list,0,2449,0.0,,
+PASS,1 Column level,dim_client,client_tier,Validity: value not in allowed list,0,2525,0.0,,
+PASS,1 Column level,dim_client,primary_account_type,Validity: value not in allowed list,0,2525,0.0,,
+PASS,1 Column level,dim_client,is_active,Validity: value not in allowed list,0,2525,0.0,,
+PASS,1 Column level,dim_client,age,"Range: outside [18, 110]",0,2525,0.0,,
+PASS,1 Column level,dim_client,initial_aum,"Range: outside [0.01, None]",0,2525,0.0,,
+PASS,1 Column level,dim_client,client_since,"Range: date outside [1990-01-01, 2024-12-31]",0,2525,0.0,,Future dates or sentinels such as 1900-01-01
+PASS,1 Column level,dim_date,date_id,Type: values not parseable as int,0,1827,0.0,,
+PASS,1 Column level,dim_date,date_id,Type: ID not stored as integer text,0,1827,0.0,,e.g. '45.0' will not join to '45'
+PASS,1 Column level,dim_date,date_id,Format: leading/trailing/double spaces,0,1827,0.0,,
+PASS,1 Column level,dim_date,date_id,Format: same value in different case/spacing,0,1827,0.0,,
+PASS,1 Column level,dim_date,date_id,Plausibility: rows piled at the minimum,0,1827,0.0,minimum = 1,A near-unique column should not repeat its edge value; placeholder or floor?
+PASS,1 Column level,dim_date,date_id,Plausibility: rows piled at the maximum,0,1827,0.0,maximum = 1827,A near-unique column should not repeat its edge value; placeholder or floor?
+PASS,1 Column level,dim_date,date,Type: values not parseable as date,0,1827,0.0,,
+PASS,1 Column level,dim_date,date,Format: leading/trailing/double spaces,0,1827,0.0,,
+PASS,1 Column level,dim_date,date,Format: same value in different case/spacing,0,1827,0.0,,
+PASS,1 Column level,dim_date,year,Type: values not parseable as int,0,1827,0.0,,
+PASS,1 Column level,dim_date,year,Format: leading/trailing/double spaces,0,1827,0.0,,
+PASS,1 Column level,dim_date,year,Format: same value in different case/spacing,0,5,0.0,,
+PASS,1 Column level,dim_date,quarter,Type: values not parseable as int,0,1827,0.0,,
+PASS,1 Column level,dim_date,quarter,Format: leading/trailing/double spaces,0,1827,0.0,,
+PASS,1 Column level,dim_date,quarter,Format: same value in different case/spacing,0,4,0.0,,
+PASS,1 Column level,dim_date,month,Type: values not parseable as int,0,1827,0.0,,
+PASS,1 Column level,dim_date,month,Format: leading/trailing/double spaces,0,1827,0.0,,
+PASS,1 Column level,dim_date,month,Format: same value in different case/spacing,0,12,0.0,,
+PASS,1 Column level,dim_date,month_name,Type: values not parseable as text,0,1827,0.0,,
+PASS,1 Column level,dim_date,month_name,Format: leading/trailing/double spaces,0,1827,0.0,,
+PASS,1 Column level,dim_date,month_name,Format: same value in different case/spacing,0,12,0.0,,
+PASS,1 Column level,dim_date,week_of_year,Type: values not parseable as int,0,1827,0.0,,
+PASS,1 Column level,dim_date,week_of_year,Format: leading/trailing/double spaces,0,1827,0.0,,
+PASS,1 Column level,dim_date,week_of_year,Format: same value in different case/spacing,0,53,0.0,,
+PASS,1 Column level,dim_date,day_of_week,Type: values not parseable as text,0,1827,0.0,,
+PASS,1 Column level,dim_date,day_of_week,Format: leading/trailing/double spaces,0,1827,0.0,,
+PASS,1 Column level,dim_date,day_of_week,Format: same value in different case/spacing,0,7,0.0,,
+PASS,1 Column level,dim_date,is_month_end,Type: values not parseable as int,0,1827,0.0,,
+PASS,1 Column level,dim_date,is_month_end,Format: leading/trailing/double spaces,0,1827,0.0,,
+PASS,1 Column level,dim_date,is_month_end,Format: same value in different case/spacing,0,2,0.0,,
+PASS,1 Column level,dim_date,is_quarter_end,Type: values not parseable as int,0,1827,0.0,,
+PASS,1 Column level,dim_date,is_quarter_end,Format: leading/trailing/double spaces,0,1827,0.0,,
+PASS,1 Column level,dim_date,is_quarter_end,Format: same value in different case/spacing,0,2,0.0,,
+PASS,1 Column level,dim_date,is_year_end,Type: values not parseable as int,0,1827,0.0,,
+PASS,1 Column level,dim_date,is_year_end,Format: leading/trailing/double spaces,0,1827,0.0,,
+PASS,1 Column level,dim_date,is_year_end,Format: same value in different case/spacing,0,2,0.0,,
+PASS,1 Column level,dim_date,is_trading_day,Type: values not parseable as int,0,1827,0.0,,
+PASS,1 Column level,dim_date,is_trading_day,Format: leading/trailing/double spaces,0,1827,0.0,,
+PASS,1 Column level,dim_date,is_trading_day,Format: same value in different case/spacing,0,2,0.0,,
+PASS,1 Column level,dim_date,date_id,Key: primary key blank,0,1827,0.0,,
+PASS,1 Column level,dim_date,date_id,Key: primary key not unique,0,1827,0.0,,
+PASS,1 Column level,dim_date,date,Key: natural key not unique,0,1827,0.0,,
+PASS,1 Column level,dim_date,is_month_end,Validity: value not in allowed list,0,1827,0.0,,
+PASS,1 Column level,dim_date,is_quarter_end,Validity: value not in allowed list,0,1827,0.0,,
+PASS,1 Column level,dim_date,is_year_end,Validity: value not in allowed list,0,1827,0.0,,
+PASS,1 Column level,dim_date,is_trading_day,Validity: value not in allowed list,0,1827,0.0,,
+PASS,1 Column level,dim_date,quarter,"Range: outside [1, 4]",0,1827,0.0,,
+PASS,1 Column level,dim_date,month,"Range: outside [1, 12]",0,1827,0.0,,
+PASS,1 Column level,dim_date,week_of_year,"Range: outside [1, 53]",0,1827,0.0,,
+PASS,1 Column level,dim_security,security_id,Type: values not parseable as int,0,500,0.0,,
+PASS,1 Column level,dim_security,security_id,Type: ID not stored as integer text,0,500,0.0,,e.g. '45.0' will not join to '45'
+PASS,1 Column level,dim_security,security_id,Format: leading/trailing/double spaces,0,500,0.0,,
+PASS,1 Column level,dim_security,security_id,Format: same value in different case/spacing,0,500,0.0,,
+PASS,1 Column level,dim_security,security_id,Plausibility: rows piled at the minimum,0,500,0.0,minimum = 1,A near-unique column should not repeat its edge value; placeholder or floor?
+PASS,1 Column level,dim_security,security_id,Plausibility: rows piled at the maximum,0,500,0.0,maximum = 500,A near-unique column should not repeat its edge value; placeholder or floor?
+PASS,1 Column level,dim_security,ticker,Type: values not parseable as text,0,500,0.0,,
+PASS,1 Column level,dim_security,ticker,Format: leading/trailing/double spaces,0,500,0.0,,
+PASS,1 Column level,dim_security,ticker,Format: same value in different case/spacing,0,500,0.0,,
+PASS,1 Column level,dim_security,name,Type: values not parseable as text,0,500,0.0,,
+PASS,1 Column level,dim_security,name,Format: leading/trailing/double spaces,0,500,0.0,,
+PASS,1 Column level,dim_security,name,Format: same value in different case/spacing,0,497,0.0,,
+PASS,1 Column level,dim_security,asset_class,Type: values not parseable as text,0,500,0.0,,
+PASS,1 Column level,dim_security,asset_class,Format: leading/trailing/double spaces,0,500,0.0,,
+PASS,1 Column level,dim_security,asset_class,Format: same value in different case/spacing,0,4,0.0,,
+PASS,1 Column level,dim_security,sector,Type: values not parseable as text,0,281,0.0,,
+PASS,1 Column level,dim_security,sector,Format: leading/trailing/double spaces,0,281,0.0,,
+PASS,1 Column level,dim_security,sector,Format: same value in different case/spacing,0,11,0.0,,
+PASS,1 Column level,dim_security,benchmark_id,Type: values not parseable as int,0,500,0.0,,
+PASS,1 Column level,dim_security,benchmark_id,Type: ID not stored as integer text,0,500,0.0,,e.g. '45.0' will not join to '45'
+PASS,1 Column level,dim_security,benchmark_id,Format: leading/trailing/double spaces,0,500,0.0,,
+PASS,1 Column level,dim_security,benchmark_id,Format: same value in different case/spacing,0,6,0.0,,
+PASS,1 Column level,dim_security,is_etf,Type: values not parseable as bool,0,500,0.0,,
+PASS,1 Column level,dim_security,is_etf,Format: leading/trailing/double spaces,0,500,0.0,,
+PASS,1 Column level,dim_security,is_etf,Format: same value in different case/spacing,0,2,0.0,,
+PASS,1 Column level,dim_security,expense_ratio_bps,Type: values not parseable as float,0,219,0.0,,
+PASS,1 Column level,dim_security,expense_ratio_bps,Format: leading/trailing/double spaces,0,219,0.0,,
+PASS,1 Column level,dim_security,expense_ratio_bps,Format: same value in different case/spacing,0,82,0.0,,
+PASS,1 Column level,dim_security,security_id,Key: primary key blank,0,500,0.0,,
+PASS,1 Column level,dim_security,security_id,Key: primary key not unique,0,500,0.0,,
+PASS,1 Column level,dim_security,ticker,Key: natural key not unique,0,500,0.0,,
+PASS,1 Column level,dim_security,asset_class,Validity: value not in allowed list,0,500,0.0,,
+PASS,1 Column level,dim_security,sector,Validity: value not in allowed list,0,281,0.0,,
+PASS,1 Column level,dim_security,is_etf,Validity: value not in allowed list,0,500,0.0,,
+PASS,1 Column level,dim_security,expense_ratio_bps,"Range: outside [0, 300]",0,219,0.0,,
+PASS,1 Column level,fact_fees,fee_id,Type: values not parseable as int,0,122197,0.0,,
+PASS,1 Column level,fact_fees,fee_id,Type: ID not stored as integer text,0,122197,0.0,,e.g. '45.0' will not join to '45'
+PASS,1 Column level,fact_fees,fee_id,Format: leading/trailing/double spaces,0,122197,0.0,,
+PASS,1 Column level,fact_fees,fee_id,Format: same value in different case/spacing,0,122197,0.0,,
+PASS,1 Column level,fact_fees,fee_id,Plausibility: rows piled at the minimum,0,122197,0.0,minimum = 1,A near-unique column should not repeat its edge value; placeholder or floor?
+PASS,1 Column level,fact_fees,fee_id,Plausibility: rows piled at the maximum,0,122197,0.0,maximum = 122197,A near-unique column should not repeat its edge value; placeholder or floor?
+PASS,1 Column level,fact_fees,client_id,Type: values not parseable as int,0,122197,0.0,,
+PASS,1 Column level,fact_fees,client_id,Type: ID not stored as integer text,0,122197,0.0,,e.g. '45.0' will not join to '45'
+PASS,1 Column level,fact_fees,client_id,Format: leading/trailing/double spaces,0,122197,0.0,,
+PASS,1 Column level,fact_fees,client_id,Format: same value in different case/spacing,0,2500,0.0,,
+PASS,1 Column level,fact_fees,advisor_id,Type: values not parseable as int,0,122197,0.0,,
+PASS,1 Column level,fact_fees,advisor_id,Type: ID not stored as integer text,0,122197,0.0,,e.g. '45.0' will not join to '45'
+PASS,1 Column level,fact_fees,advisor_id,Format: leading/trailing/double spaces,0,122197,0.0,,
+PASS,1 Column level,fact_fees,advisor_id,Format: same value in different case/spacing,0,25,0.0,,
+PASS,1 Column level,fact_fees,fee_date,Type: values not parseable as date,0,122197,0.0,,
+PASS,1 Column level,fact_fees,fee_date,Format: leading/trailing/double spaces,0,122197,0.0,,
+PASS,1 Column level,fact_fees,fee_date,Format: same value in different case/spacing,0,60,0.0,,
+PASS,1 Column level,fact_fees,fee_type,Type: values not parseable as text,0,122197,0.0,,
+PASS,1 Column level,fact_fees,fee_type,Format: leading/trailing/double spaces,0,122197,0.0,,
+PASS,1 Column level,fact_fees,fee_type,Format: same value in different case/spacing,0,4,0.0,,
+PASS,1 Column level,fact_fees,aum_basis,Type: values not parseable as float,0,122197,0.0,,
+PASS,1 Column level,fact_fees,aum_basis,Format: leading/trailing/double spaces,0,122197,0.0,,
+PASS,1 Column level,fact_fees,aum_basis,Format: same value in different case/spacing,0,121755,0.0,,
+PASS,1 Column level,fact_fees,aum_basis,Plausibility: rows piled at the maximum,0,122197,0.0,maximum = 82386642.91,A near-unique column should not repeat its edge value; placeholder or floor?
+PASS,1 Column level,fact_fees,bps_charged,Type: values not parseable as float,0,122197,0.0,,
+PASS,1 Column level,fact_fees,bps_charged,Format: leading/trailing/double spaces,0,122197,0.0,,
+PASS,1 Column level,fact_fees,bps_charged,Format: same value in different case/spacing,0,5217,0.0,,
+PASS,1 Column level,fact_fees,amount,Type: values not parseable as float,0,122197,0.0,,
+PASS,1 Column level,fact_fees,amount,Format: leading/trailing/double spaces,0,122197,0.0,,
+PASS,1 Column level,fact_fees,amount,Format: same value in different case/spacing,0,81649,0.0,,
+PASS,1 Column level,fact_fees,amount,Plausibility: rows piled at the minimum,0,122197,0.0,minimum = 0.65,A near-unique column should not repeat its edge value; placeholder or floor?
+PASS,1 Column level,fact_fees,amount,Plausibility: rows piled at the maximum,0,122197,0.0,maximum = 29412.47,A near-unique column should not repeat its edge value; placeholder or floor?
+PASS,1 Column level,fact_fees,fee_id,Key: primary key blank,0,122197,0.0,,
+PASS,1 Column level,fact_fees,fee_id,Key: primary key not unique,0,122197,0.0,,
+PASS,1 Column level,fact_fees,fee_type,Validity: value not in allowed list,0,122197,0.0,,
+PASS,1 Column level,fact_fees,aum_basis,"Range: outside [0.01, None]",0,122197,0.0,,
+PASS,1 Column level,fact_fees,amount,"Range: outside [0.01, None]",0,122197,0.0,,
+PASS,1 Column level,fact_portfolio_snapshot,snapshot_id,Type: values not parseable as int,0,129547,0.0,,
+PASS,1 Column level,fact_portfolio_snapshot,snapshot_id,Type: ID not stored as integer text,0,129547,0.0,,e.g. '45.0' will not join to '45'
+PASS,1 Column level,fact_portfolio_snapshot,snapshot_id,Format: leading/trailing/double spaces,0,129547,0.0,,
+PASS,1 Column level,fact_portfolio_snapshot,snapshot_id,Format: same value in different case/spacing,0,129547,0.0,,
+PASS,1 Column level,fact_portfolio_snapshot,snapshot_id,Plausibility: rows piled at the minimum,0,129547,0.0,minimum = 1,A near-unique column should not repeat its edge value; placeholder or floor?
+PASS,1 Column level,fact_portfolio_snapshot,snapshot_id,Plausibility: rows piled at the maximum,0,129547,0.0,maximum = 129547,A near-unique column should not repeat its edge value; placeholder or floor?
+PASS,1 Column level,fact_portfolio_snapshot,client_id,Type: values not parseable as int,0,129547,0.0,,
+PASS,1 Column level,fact_portfolio_snapshot,client_id,Type: ID not stored as integer text,0,129547,0.0,,e.g. '45.0' will not join to '45'
+PASS,1 Column level,fact_portfolio_snapshot,client_id,Format: leading/trailing/double spaces,0,129547,0.0,,
+PASS,1 Column level,fact_portfolio_snapshot,client_id,Format: same value in different case/spacing,0,2500,0.0,,
+PASS,1 Column level,fact_portfolio_snapshot,advisor_id,Type: values not parseable as int,0,129547,0.0,,
+PASS,1 Column level,fact_portfolio_snapshot,advisor_id,Type: ID not stored as integer text,0,129547,0.0,,e.g. '45.0' will not join to '45'
+PASS,1 Column level,fact_portfolio_snapshot,advisor_id,Format: leading/trailing/double spaces,0,129547,0.0,,
+PASS,1 Column level,fact_portfolio_snapshot,advisor_id,Format: same value in different case/spacing,0,25,0.0,,
+PASS,1 Column level,fact_portfolio_snapshot,benchmark_id,Type: values not parseable as int,0,129547,0.0,,
+PASS,1 Column level,fact_portfolio_snapshot,benchmark_id,Type: ID not stored as integer text,0,129547,0.0,,e.g. '45.0' will not join to '45'
+PASS,1 Column level,fact_portfolio_snapshot,benchmark_id,Format: leading/trailing/double spaces,0,129547,0.0,,
+PASS,1 Column level,fact_portfolio_snapshot,benchmark_id,Format: same value in different case/spacing,0,3,0.0,,
+PASS,1 Column level,fact_portfolio_snapshot,snapshot_date,Type: values not parseable as date,0,129547,0.0,,
+PASS,1 Column level,fact_portfolio_snapshot,snapshot_date,Format: leading/trailing/double spaces,0,129547,0.0,,
+PASS,1 Column level,fact_portfolio_snapshot,snapshot_date,Format: same value in different case/spacing,0,60,0.0,,
+PASS,1 Column level,fact_portfolio_snapshot,year,Type: values not parseable as int,0,129547,0.0,,
+PASS,1 Column level,fact_portfolio_snapshot,year,Format: leading/trailing/double spaces,0,129547,0.0,,
+PASS,1 Column level,fact_portfolio_snapshot,year,Format: same value in different case/spacing,0,5,0.0,,
+PASS,1 Column level,fact_portfolio_snapshot,month,Type: values not parseable as int,0,129547,0.0,,
+PASS,1 Column level,fact_portfolio_snapshot,month,Format: leading/trailing/double spaces,0,129547,0.0,,
+PASS,1 Column level,fact_portfolio_snapshot,month,Format: same value in different case/spacing,0,12,0.0,,
+PASS,1 Column level,fact_portfolio_snapshot,aum,Type: values not parseable as float,0,129547,0.0,,
+PASS,1 Column level,fact_portfolio_snapshot,aum,Format: leading/trailing/double spaces,0,129547,0.0,,
+PASS,1 Column level,fact_portfolio_snapshot,aum,Format: same value in different case/spacing,0,129062,0.0,,
+PASS,1 Column level,fact_portfolio_snapshot,aum,Plausibility: rows piled at the maximum,0,129547,0.0,maximum = 82386642.91,A near-unique column should not repeat its edge value; placeholder or floor?
+PASS,1 Column level,fact_portfolio_snapshot,return_ytd,Format: leading/trailing/double spaces,0,129547,0.0,,
+PASS,1 Column level,fact_portfolio_snapshot,return_ytd,Format: same value in different case/spacing,0,112233,0.0,,
+PASS,1 Column level,fact_portfolio_snapshot,return_ytd,Plausibility: rows piled at the minimum,0,129547,0.0,minimum = -0.993708,A near-unique column should not repeat its edge value; placeholder or floor?
+PASS,1 Column level,fact_portfolio_snapshot,return_ytd,Plausibility: rows piled at the maximum,0,129547,0.0,maximum = 94.668215,A near-unique column should not repeat its edge value; placeholder or floor?
+PASS,1 Column level,fact_portfolio_snapshot,benchmark_return_ytd,Type: values not parseable as float,0,129547,0.0,,
+PASS,1 Column level,fact_portfolio_snapshot,benchmark_return_ytd,Format: leading/trailing/double spaces,0,129547,0.0,,
+PASS,1 Column level,fact_portfolio_snapshot,benchmark_return_ytd,Format: same value in different case/spacing,0,180,0.0,,
+PASS,1 Column level,fact_portfolio_snapshot,active_alpha_ytd,Type: values not parseable as float,0,129547,0.0,,
+PASS,1 Column level,fact_portfolio_snapshot,active_alpha_ytd,Format: leading/trailing/double spaces,0,129547,0.0,,
+PASS,1 Column level,fact_portfolio_snapshot,active_alpha_ytd,Format: same value in different case/spacing,0,85398,0.0,,
+PASS,1 Column level,fact_portfolio_snapshot,active_alpha_ytd,Plausibility: rows piled at the minimum,0,129547,0.0,minimum = -1.22245,A near-unique column should not repeat its edge value; placeholder or floor?
+PASS,1 Column level,fact_portfolio_snapshot,active_alpha_ytd,Plausibility: rows piled at the maximum,0,129547,0.0,maximum = 94.569541,A near-unique column should not repeat its edge value; placeholder or floor?
+PASS,1 Column level,fact_portfolio_snapshot,cash_pct,Type: values not parseable as float,0,129547,0.0,,
+PASS,1 Column level,fact_portfolio_snapshot,cash_pct,Format: leading/trailing/double spaces,0,129547,0.0,,
+PASS,1 Column level,fact_portfolio_snapshot,cash_pct,Format: same value in different case/spacing,0,701,0.0,,
+PASS,1 Column level,fact_portfolio_snapshot,account_type,Type: values not parseable as text,0,129547,0.0,,
+PASS,1 Column level,fact_portfolio_snapshot,account_type,Format: leading/trailing/double spaces,0,129547,0.0,,
+PASS,1 Column level,fact_portfolio_snapshot,account_type,Format: same value in different case/spacing,0,5,0.0,,
+PASS,1 Column level,fact_portfolio_snapshot,snapshot_id,Key: primary key blank,0,129547,0.0,,
+PASS,1 Column level,fact_portfolio_snapshot,snapshot_id,Key: primary key not unique,0,129547,0.0,,
+PASS,1 Column level,fact_portfolio_snapshot,account_type,Validity: value not in allowed list,0,129547,0.0,,
+PASS,1 Column level,fact_portfolio_snapshot,aum,"Range: outside [0.01, None]",0,129547,0.0,,
+PASS,1 Column level,fact_portfolio_snapshot,cash_pct,"Range: outside [0, 1]",0,129547,0.0,,
+PASS,1 Column level,fact_portfolio_snapshot,benchmark_return_ytd,"Range: outside [-1, 1]",0,129547,0.0,,
+PASS,1 Column level,fact_portfolio_snapshot,return_ytd,Range: return below -1 (-100%),0,129247,0.0,,Cannot lose more than everything
+PASS,1 Column level,fact_transactions,txn_id,Type: values not parseable as int,0,298772,0.0,,
+PASS,1 Column level,fact_transactions,txn_id,Type: ID not stored as integer text,0,298772,0.0,,e.g. '45.0' will not join to '45'
+PASS,1 Column level,fact_transactions,txn_id,Format: leading/trailing/double spaces,0,298772,0.0,,
+PASS,1 Column level,fact_transactions,txn_id,Format: same value in different case/spacing,0,298772,0.0,,
+PASS,1 Column level,fact_transactions,txn_id,Plausibility: rows piled at the minimum,0,298772,0.0,minimum = 1,A near-unique column should not repeat its edge value; placeholder or floor?
+PASS,1 Column level,fact_transactions,txn_id,Plausibility: rows piled at the maximum,0,298772,0.0,maximum = 298772,A near-unique column should not repeat its edge value; placeholder or floor?
+PASS,1 Column level,fact_transactions,client_id,Type: values not parseable as int,0,298772,0.0,,
+PASS,1 Column level,fact_transactions,client_id,Type: ID not stored as integer text,0,298772,0.0,,e.g. '45.0' will not join to '45'
+PASS,1 Column level,fact_transactions,client_id,Format: leading/trailing/double spaces,0,298772,0.0,,
+PASS,1 Column level,fact_transactions,client_id,Format: same value in different case/spacing,0,2700,0.0,,
+PASS,1 Column level,fact_transactions,advisor_id,Type: values not parseable as int,0,298772,0.0,,
+PASS,1 Column level,fact_transactions,advisor_id,Type: ID not stored as integer text,0,298772,0.0,,e.g. '45.0' will not join to '45'
+PASS,1 Column level,fact_transactions,advisor_id,Format: leading/trailing/double spaces,0,298772,0.0,,
+PASS,1 Column level,fact_transactions,advisor_id,Format: same value in different case/spacing,0,25,0.0,,
+PASS,1 Column level,fact_transactions,security_id,Type: values not parseable as float,0,197175,0.0,,
+PASS,1 Column level,fact_transactions,security_id,Format: leading/trailing/double spaces,0,197175,0.0,,
+PASS,1 Column level,fact_transactions,security_id,Format: same value in different case/spacing,0,500,0.0,,
+PASS,1 Column level,fact_transactions,txn_date,Type: values not parseable as date,0,298772,0.0,,
+PASS,1 Column level,fact_transactions,txn_date,Format: leading/trailing/double spaces,0,298772,0.0,,
+PASS,1 Column level,fact_transactions,txn_date,Format: same value in different case/spacing,0,1826,0.0,,
+PASS,1 Column level,fact_transactions,txn_type,Type: values not parseable as text,0,298772,0.0,,
+PASS,1 Column level,fact_transactions,txn_type,Format: leading/trailing/double spaces,0,298772,0.0,,
+PASS,1 Column level,fact_transactions,txn_type,Format: same value in different case/spacing,0,6,0.0,,
+PASS,1 Column level,fact_transactions,shares,Type: values not parseable as float,0,197175,0.0,,
+PASS,1 Column level,fact_transactions,shares,Format: leading/trailing/double spaces,0,197175,0.0,,
+PASS,1 Column level,fact_transactions,shares,Format: same value in different case/spacing,0,193253,0.0,,
+PASS,1 Column level,fact_transactions,shares,Plausibility: rows piled at the minimum,0,197175,0.0,minimum = -499.6323,A near-unique column should not repeat its edge value; placeholder or floor?
+PASS,1 Column level,fact_transactions,shares,Plausibility: rows piled at the maximum,0,197175,0.0,maximum = 499.9981,A near-unique column should not repeat its edge value; placeholder or floor?
+PASS,1 Column level,fact_transactions,price,Type: values not parseable as float,0,197175,0.0,,
+PASS,1 Column level,fact_transactions,price,Format: leading/trailing/double spaces,0,197175,0.0,,
+PASS,1 Column level,fact_transactions,price,Format: same value in different case/spacing,0,48104,0.0,,
+PASS,1 Column level,fact_transactions,amount,Type: values not parseable as float,0,298772,0.0,,
+PASS,1 Column level,fact_transactions,amount,Format: leading/trailing/double spaces,0,298772,0.0,,
+PASS,1 Column level,fact_transactions,amount,Format: same value in different case/spacing,0,292741,0.0,,
+PASS,1 Column level,fact_transactions,amount,Plausibility: rows piled at the minimum,0,298772,0.0,minimum = 13.33,A near-unique column should not repeat its edge value; placeholder or floor?
+PASS,1 Column level,fact_transactions,amount,Plausibility: rows piled at the maximum,0,298772,0.0,maximum = 249302.33,A near-unique column should not repeat its edge value; placeholder or floor?
+PASS,1 Column level,fact_transactions,txn_id,Key: primary key blank,0,298772,0.0,,
+PASS,1 Column level,fact_transactions,txn_id,Key: primary key not unique,0,298772,0.0,,
+PASS,1 Column level,fact_transactions,txn_type,Validity: value not in allowed list,0,298772,0.0,,
+PASS,1 Column level,fact_transactions,price,"Range: outside [0.01, None]",0,197175,0.0,,
+PASS,1 Column level,fact_transactions,amount,"Range: outside [0.01, None]",0,298772,0.0,,
+PASS,2 Single-table,dim_advisor,(all),Duplicates: identical rows apart from the key,0,25,0.0,,
+PASS,2 Single-table,dim_advisor,first_name,Near-duplicates: rows identical except 'first_name',0,25,0.0,advisor_id; first_name,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,dim_advisor,last_name,Near-duplicates: rows identical except 'last_name',0,25,0.0,advisor_id; last_name,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,dim_advisor,region,Near-duplicates: rows identical except 'region',0,25,0.0,advisor_id; region,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,dim_advisor,years_experience,Near-duplicates: rows identical except 'years_experience',0,25,0.0,advisor_id; years_experience,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,dim_advisor,aum_target_mm,Near-duplicates: rows identical except 'aum_target_mm',0,25,0.0,advisor_id; aum_target_mm,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,dim_advisor,certifications,Near-duplicates: rows identical except 'certifications',0,25,0.0,advisor_id; certifications,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,dim_benchmark,(all),Duplicates: identical rows apart from the key,0,8,0.0,,
+PASS,2 Single-table,dim_client,(all),Duplicates: identical rows apart from the key,0,2525,0.0,,
+PASS,2 Single-table,dim_client,first_name,Near-duplicates: rows identical except 'first_name',0,2525,0.0,client_id; first_name,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,dim_client,age,Near-duplicates: rows identical except 'age',0,2525,0.0,client_id; age,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,dim_client,city,Near-duplicates: rows identical except 'city',0,2525,0.0,client_id; city,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,dim_client,state,Near-duplicates: rows identical except 'state',0,2525,0.0,client_id; state,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,dim_client,zip_code,Near-duplicates: rows identical except 'zip_code',0,2525,0.0,client_id; zip_code,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,dim_client,risk_profile,Near-duplicates: rows identical except 'risk_profile',0,2525,0.0,client_id; risk_profile,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,dim_client,client_tier,Near-duplicates: rows identical except 'client_tier',0,2525,0.0,client_id; client_tier,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,dim_client,primary_account_type,Near-duplicates: rows identical except 'primary_account_type',0,2525,0.0,client_id; primary_account_type,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,dim_client,initial_aum,Near-duplicates: rows identical except 'initial_aum',0,2525,0.0,client_id; initial_aum,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,dim_client,client_since,Near-duplicates: rows identical except 'client_since',0,2525,0.0,client_id; client_since,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,dim_client,advisor_id,Near-duplicates: rows identical except 'advisor_id',0,2525,0.0,client_id; advisor_id,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,dim_client,is_active,Near-duplicates: rows identical except 'is_active',0,2525,0.0,client_id; is_active,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,dim_date,(all),Duplicates: identical rows apart from the key,0,1827,0.0,,
+PASS,2 Single-table,dim_date,date,Near-duplicates: rows identical except 'date',0,1827,0.0,date_id; date,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,dim_date,year,Near-duplicates: rows identical except 'year',0,1827,0.0,date_id; year,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,dim_date,quarter,Near-duplicates: rows identical except 'quarter',0,1827,0.0,date_id; quarter,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,dim_date,month,Near-duplicates: rows identical except 'month',0,1827,0.0,date_id; month,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,dim_date,month_name,Near-duplicates: rows identical except 'month_name',0,1827,0.0,date_id; month_name,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,dim_date,week_of_year,Near-duplicates: rows identical except 'week_of_year',0,1827,0.0,date_id; week_of_year,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,dim_date,day_of_week,Near-duplicates: rows identical except 'day_of_week',0,1827,0.0,date_id; day_of_week,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,dim_date,is_month_end,Near-duplicates: rows identical except 'is_month_end',0,1827,0.0,date_id; is_month_end,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,dim_date,is_quarter_end,Near-duplicates: rows identical except 'is_quarter_end',0,1827,0.0,date_id; is_quarter_end,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,dim_date,is_year_end,Near-duplicates: rows identical except 'is_year_end',0,1827,0.0,date_id; is_year_end,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,dim_date,is_trading_day,Near-duplicates: rows identical except 'is_trading_day',0,1827,0.0,date_id; is_trading_day,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,dim_date,(calendar),Contradiction: calendar columns disagree with date,0,1827,0.0,,
+PASS,2 Single-table,dim_date,is_trading_day,Contradiction: weekend marked as trading day,0,1827,0.0,,
+PASS,2 Single-table,dim_security,(all),Duplicates: identical rows apart from the key,0,500,0.0,,
+PASS,2 Single-table,dim_security,ticker,Near-duplicates: rows identical except 'ticker',0,500,0.0,security_id; ticker,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,dim_security,name,Near-duplicates: rows identical except 'name',0,500,0.0,security_id; name,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,dim_security,asset_class,Near-duplicates: rows identical except 'asset_class',0,500,0.0,security_id; asset_class,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,dim_security,sector,Near-duplicates: rows identical except 'sector',0,500,0.0,security_id; sector,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,dim_security,benchmark_id,Near-duplicates: rows identical except 'benchmark_id',0,500,0.0,security_id; benchmark_id,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,dim_security,is_etf,Near-duplicates: rows identical except 'is_etf',0,500,0.0,security_id; is_etf,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,dim_security,expense_ratio_bps,Near-duplicates: rows identical except 'expense_ratio_bps',0,500,0.0,security_id; expense_ratio_bps,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,dim_security,sector,Contradiction: non-ETF with blank sector,0,281,0.0,,"ETFs span sectors, so blank sector on ETFs is structure"
+PASS,2 Single-table,dim_security,sector,Contradiction: ETF with a sector,0,219,0.0,,"ETFs span sectors, so blank sector on ETFs is structure"
+PASS,2 Single-table,dim_security,expense_ratio_bps,Contradiction: ETF with blank expense ratio,0,219,0.0,,"Individual securities have no expense ratio, so blank there is structure"
+PASS,2 Single-table,dim_security,expense_ratio_bps,Contradiction: non-ETF with an expense ratio,0,281,0.0,,"Individual securities have no expense ratio, so blank there is structure"
+PASS,2 Single-table,fact_fees,(all),Duplicates: identical rows apart from the key,0,122197,0.0,,
+PASS,2 Single-table,fact_fees,client_id,Near-duplicates: rows identical except 'client_id',0,122197,0.0,fee_id; client_id,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,fact_fees,advisor_id,Near-duplicates: rows identical except 'advisor_id',0,122197,0.0,fee_id; advisor_id,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,fact_fees,fee_type,Near-duplicates: rows identical except 'fee_type',0,122197,0.0,fee_id; fee_type,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,fact_fees,aum_basis,Near-duplicates: rows identical except 'aum_basis',0,122197,0.0,fee_id; aum_basis,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,fact_fees,bps_charged,Near-duplicates: rows identical except 'bps_charged',0,122197,0.0,fee_id; bps_charged,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,fact_fees,amount,Near-duplicates: rows identical except 'amount',0,122197,0.0,fee_id; amount,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,fact_fees,amount,Recompute: amount != aum_basis x bps / 10000 / 12,0,122197,0.0,,
+PASS,2 Single-table,fact_portfolio_snapshot,(all),Duplicates: identical rows apart from the key,0,129547,0.0,,
+PASS,2 Single-table,fact_portfolio_snapshot,client_id,Near-duplicates: rows identical except 'client_id',0,129547,0.0,snapshot_id; client_id,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,fact_portfolio_snapshot,advisor_id,Near-duplicates: rows identical except 'advisor_id',0,129547,0.0,snapshot_id; advisor_id,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,fact_portfolio_snapshot,benchmark_id,Near-duplicates: rows identical except 'benchmark_id',0,129547,0.0,snapshot_id; benchmark_id,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,fact_portfolio_snapshot,snapshot_date,Near-duplicates: rows identical except 'snapshot_date',0,129547,0.0,snapshot_id; snapshot_date,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,fact_portfolio_snapshot,year,Near-duplicates: rows identical except 'year',0,129547,0.0,snapshot_id; year,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,fact_portfolio_snapshot,month,Near-duplicates: rows identical except 'month',0,129547,0.0,snapshot_id; month,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,fact_portfolio_snapshot,aum,Near-duplicates: rows identical except 'aum',0,129547,0.0,snapshot_id; aum,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,fact_portfolio_snapshot,return_ytd,Near-duplicates: rows identical except 'return_ytd',0,129547,0.0,snapshot_id; return_ytd,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,fact_portfolio_snapshot,benchmark_return_ytd,Near-duplicates: rows identical except 'benchmark_return_ytd',0,129547,0.0,snapshot_id; benchmark_return_ytd,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,fact_portfolio_snapshot,active_alpha_ytd,Near-duplicates: rows identical except 'active_alpha_ytd',0,129547,0.0,snapshot_id; active_alpha_ytd,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,fact_portfolio_snapshot,cash_pct,Near-duplicates: rows identical except 'cash_pct',0,129547,0.0,snapshot_id; cash_pct,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,fact_portfolio_snapshot,account_type,Near-duplicates: rows identical except 'account_type',0,129547,0.0,snapshot_id; account_type,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,fact_portfolio_snapshot,year/month,Contradiction: year/month disagree with snapshot_date,0,129547,0.0,,
+PASS,2 Single-table,fact_portfolio_snapshot,active_alpha_ytd,Recompute: alpha != return_ytd - benchmark_return_ytd,0,129247,0.0,,300 rows not checkable because a value did not parse
+PASS,2 Single-table,fact_transactions,(all),Duplicates: identical rows apart from the key,0,298772,0.0,,
+PASS,2 Single-table,fact_transactions,advisor_id,Near-duplicates: rows identical except 'advisor_id',0,298772,0.0,txn_id; advisor_id,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,fact_transactions,security_id,Near-duplicates: rows identical except 'security_id',0,298772,0.0,txn_id; security_id,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,fact_transactions,txn_type,Near-duplicates: rows identical except 'txn_type',0,298772,0.0,txn_id; txn_type,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,fact_transactions,shares,Near-duplicates: rows identical except 'shares',0,298772,0.0,txn_id; shares,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,fact_transactions,price,Near-duplicates: rows identical except 'price',0,298772,0.0,txn_id; price,Same entity entered twice with one field changed? Or a coincidence?
+PASS,2 Single-table,fact_transactions,security_id/shares/price,"Contradiction: trade row missing security, shares or price",0,197175,0.0,,
+PASS,2 Single-table,fact_transactions,security_id/shares/price,"Contradiction: cash row has security, shares or price",0,101597,0.0,,"Blank security/shares/price on cash rows is structure, not missing data"
+PASS,2 Single-table,fact_transactions,amount,Recompute: Buy/Sell amount != |shares| x price,0,143311,0.0,,
+PASS,3 Referential integrity,dim_client,advisor_id,Null key -> dim_advisor.advisor_id,0,2525,0.0,,Blank FK: check whether it is structural
+PASS,3 Referential integrity,dim_client,advisor_id,Join breaks on raw text -> dim_advisor.advisor_id,0,2525,0.0,,Raw text does not match the dimension key exactly
+PASS,3 Referential integrity,dim_client,advisor_id,Orphans: no matching dim_advisor.advisor_id (after normalizing),0,2525,0.0,,
+PASS,3 Referential integrity,dim_security,benchmark_id,Null key -> dim_benchmark.benchmark_id,0,500,0.0,,Blank FK: check whether it is structural
+PASS,3 Referential integrity,dim_security,benchmark_id,Join breaks on raw text -> dim_benchmark.benchmark_id,0,500,0.0,,Raw text does not match the dimension key exactly
+PASS,3 Referential integrity,dim_security,benchmark_id,Orphans: no matching dim_benchmark.benchmark_id (after normalizing),0,500,0.0,,
+PASS,3 Referential integrity,fact_fees,client_id,Null key -> dim_client.client_id,0,122197,0.0,,Blank FK: check whether it is structural
+PASS,3 Referential integrity,fact_fees,client_id,Join breaks on raw text -> dim_client.client_id,0,122197,0.0,,Raw text does not match the dimension key exactly
+PASS,3 Referential integrity,fact_fees,client_id,Orphans: no matching dim_client.client_id (after normalizing),0,122197,0.0,,
+PASS,3 Referential integrity,fact_fees,advisor_id,Null key -> dim_advisor.advisor_id,0,122197,0.0,,Blank FK: check whether it is structural
+PASS,3 Referential integrity,fact_fees,advisor_id,Join breaks on raw text -> dim_advisor.advisor_id,0,122197,0.0,,Raw text does not match the dimension key exactly
+PASS,3 Referential integrity,fact_fees,advisor_id,Orphans: no matching dim_advisor.advisor_id (after normalizing),0,122197,0.0,,
+PASS,3 Referential integrity,fact_fees,fee_date,Null key -> dim_date.date,0,122197,0.0,,Blank FK: check whether it is structural
+PASS,3 Referential integrity,fact_fees,fee_date,Join breaks on raw text -> dim_date.date,0,122197,0.0,,Raw text does not match the dimension key exactly
+PASS,3 Referential integrity,fact_fees,fee_date,Orphans: no matching dim_date.date (after normalizing),0,122197,0.0,,
+PASS,3 Referential integrity,fact_portfolio_snapshot,client_id,Null key -> dim_client.client_id,0,129547,0.0,,Blank FK: check whether it is structural
+PASS,3 Referential integrity,fact_portfolio_snapshot,client_id,Join breaks on raw text -> dim_client.client_id,0,129547,0.0,,Raw text does not match the dimension key exactly
+PASS,3 Referential integrity,fact_portfolio_snapshot,client_id,Orphans: no matching dim_client.client_id (after normalizing),0,129547,0.0,,
+PASS,3 Referential integrity,fact_portfolio_snapshot,advisor_id,Null key -> dim_advisor.advisor_id,0,129547,0.0,,Blank FK: check whether it is structural
+PASS,3 Referential integrity,fact_portfolio_snapshot,advisor_id,Join breaks on raw text -> dim_advisor.advisor_id,0,129547,0.0,,Raw text does not match the dimension key exactly
+PASS,3 Referential integrity,fact_portfolio_snapshot,advisor_id,Orphans: no matching dim_advisor.advisor_id (after normalizing),0,129547,0.0,,
+PASS,3 Referential integrity,fact_portfolio_snapshot,benchmark_id,Null key -> dim_benchmark.benchmark_id,0,129547,0.0,,Blank FK: check whether it is structural
+PASS,3 Referential integrity,fact_portfolio_snapshot,benchmark_id,Join breaks on raw text -> dim_benchmark.benchmark_id,0,129547,0.0,,Raw text does not match the dimension key exactly
+PASS,3 Referential integrity,fact_portfolio_snapshot,benchmark_id,Orphans: no matching dim_benchmark.benchmark_id (after normalizing),0,129547,0.0,,
+PASS,3 Referential integrity,fact_portfolio_snapshot,snapshot_date,Null key -> dim_date.date,0,129547,0.0,,Blank FK: check whether it is structural
+PASS,3 Referential integrity,fact_portfolio_snapshot,snapshot_date,Join breaks on raw text -> dim_date.date,0,129547,0.0,,Raw text does not match the dimension key exactly
+PASS,3 Referential integrity,fact_portfolio_snapshot,snapshot_date,Orphans: no matching dim_date.date (after normalizing),0,129547,0.0,,
+PASS,3 Referential integrity,fact_transactions,client_id,Null key -> dim_client.client_id,0,298772,0.0,,Blank FK: check whether it is structural
+PASS,3 Referential integrity,fact_transactions,advisor_id,Null key -> dim_advisor.advisor_id,0,298772,0.0,,Blank FK: check whether it is structural
+PASS,3 Referential integrity,fact_transactions,advisor_id,Join breaks on raw text -> dim_advisor.advisor_id,0,298772,0.0,,Raw text does not match the dimension key exactly
+PASS,3 Referential integrity,fact_transactions,advisor_id,Orphans: no matching dim_advisor.advisor_id (after normalizing),0,298772,0.0,,
+PASS,3 Referential integrity,fact_transactions,security_id,Orphans: no matching dim_security.security_id (after normalizing),0,197175,0.0,,
+PASS,3 Referential integrity,fact_transactions,txn_date,Null key -> dim_date.date,0,298772,0.0,,Blank FK: check whether it is structural
+PASS,3 Referential integrity,fact_transactions,txn_date,Join breaks on raw text -> dim_date.date,0,298772,0.0,,Raw text does not match the dimension key exactly
+PASS,3 Referential integrity,fact_transactions,txn_date,Orphans: no matching dim_date.date (after normalizing),0,298772,0.0,,
+PASS,4 Cross-table,dim_client,risk_profile,Risk profile maps to more than one snapshot benchmark,0,5,0.0,Aggressive -> 1; Balanced -> 3; Conservative -> 8; Moderately Aggressive -> 1; Moderately Conservative -> 8,"If each profile has one benchmark, the benchmark can confirm or recover a profile"
+PASS,4 Cross-table,fact_fees,advisor_id,Fact advisor != client's advisor in dim_client,0,122197,0.0,,
+PASS,4 Cross-table,fact_fees,fee_date,Activity dated before client_since,0,122197,0.0,,
+PASS,4 Cross-table,fact_fees,aum_basis,"aum_basis != snapshot aum (same client, month)",0,122197,0.0,,0 fee rows had no usable matching snapshot
+PASS,4 Cross-table,fact_portfolio_snapshot,advisor_id,Fact advisor != client's advisor in dim_client,0,129547,0.0,,
+PASS,4 Cross-table,fact_portfolio_snapshot,snapshot_date,Activity dated before client_since,0,129547,0.0,,
+PASS,4 Cross-table,fact_portfolio_snapshot,account_type,account_type != client's primary_account_type,0,129547,0.0,,
+PASS,4 Cross-table,fact_transactions,advisor_id,Fact advisor != client's advisor in dim_client,0,298572,0.0,,
+PASS,4 Cross-table,fact_transactions,txn_date,Activity dated before client_since,0,298572,0.0,,
