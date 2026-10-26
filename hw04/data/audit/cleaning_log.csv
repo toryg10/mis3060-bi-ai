@@ -1,0 +1,13 @@
+step,table,issue,action,rows_affected,note
+D1,dim_client,25 duplicate clients (last_name off by one letter),quarantine,25,Matched to originals on every other column; none referenced by any fact table
+D2,fact_transactions,200 transactions for non-existent clients,quarantine,200,Each identical to a real transaction except client_id (twin txn_id kept in quarantine file)
+D3,fact_transactions,security_id stored as decimal text,convert,197044,'45.0' -> '45'; raw join rate 0% -> 100%
+D4,dim_client,state spelled out,standardize,77,Full names mapped to USPS codes
+D5,fact_transactions,Buy with negative shares,convert (absolute value),835,Verified against amount = |shares| x price; direction comes from txn_type
+D6,fact_portfolio_snapshot,return_ytd stored as percent text,convert (/100),300,Scale confirmed by return - benchmark = alpha
+D7,dim_client,blank risk_profile,fill + flag risk_profile_imputed,75,Benchmark 3 is used only by Balanced clients (757 of 757 known)
+D8,fact_transactions,dividend amount = whole position value,flag dividend_amount_suspect,53826,No yield data exists to compute the true dividend
+D9,fact_portfolio_snapshot,return_ytd above +100%,flag return_suspect,977,Coincides with large deposits; not recomputable without daily flows
+D10,fact_portfolio_snapshot,aum = 1000.0 floor,flag aum_floor_flag,420,
+D10,fact_fees,aum_basis = 1000.0 floor,flag aum_floor_flag,386,
+D11,fact_transactions,Buy/Sell on non-trading day,flag non_trading_day_trade,40630,

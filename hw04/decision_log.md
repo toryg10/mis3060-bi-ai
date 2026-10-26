@@ -8,15 +8,17 @@ Written **before** any cleaning code, from the evidence in `reports/dq_summary_r
 3. Fix values that can be reconciled against other columns or tables (D5, D6, D7).
 4. Add flag columns where a value is suspicious but cannot be corrected (D8–D11).
 
+> **Counts after quarantine.** The audit counted raw rows. Because D1 and D2 run first, some later steps touch slightly fewer rows than the evidence below (e.g. D3 converts 197,044 IDs, not 197,175, because 131 of the quarantined orphans were trades). `02_clean.py` states each adjusted count and asserts it.
+
 ---
 
 ## Part 1: Changes to the data
 
-### D1. Duplicate clients with truncated last names
+### D1. Duplicate clients with a mistyped last name
 | Field | Entry |
 |---|---|
 | **Table / column** | `dim_client` / whole row (`client_id` 2501–2525) |
-| **Evidence** | 25 clients (50 rows in the near-duplicate check) are identical except `last_name`, which is cut short in the copy: `Taylo`/`Taylor` (2501 ↔ 674), `Marti`/`Martin` (2502 ↔ 1795), `Jacobso`/`Jacobson` (2503 ↔ 99). They match the original on first name, age, ZIP, initial AUM, client_since and advisor. Separately, the cross-table check found exactly these 25 clients have **no** fees, snapshots or transactions. |
+| **Evidence** | 25 clients (50 rows in the near-duplicate check) are identical except `last_name`, which is off by one letter at the end in the copy: 23 drop the last letter (`Taylo`/`Taylor` 2501 ↔ 674, `Marti`/`Martin` 2502 ↔ 1795) and 2 add one (`Leen`/`Lee` 2512 ↔ 1193, `Pacen`/`Pace` 2515 ↔ 889). The copy is identified as the record no fact row points to; its original always has activity. They match the original on first name, age, ZIP, initial AUM, client_since and advisor. Separately, the cross-table check found exactly these 25 clients have **no** fees, snapshots or transactions. |
 | **Dimension violated** | Uniqueness |
 | **Decision** | **Quarantine** the 25 copies to `data/audit/quarantine_dim_client_duplicates.csv`, with the ID of the original each one duplicates. |
 | **Justification** | Each copy is the same person entered twice. Keeping them inflates the client count from 2,500 to 2,525 and would split any client-level KPI. Because no fact row points to a copy, removing them cannot orphan anything. |
@@ -96,7 +98,7 @@ Written **before** any cleaning code, from the evidence in `reports/dq_summary_r
 | Field | Entry |
 |---|---|
 | **Table / column** | `fact_portfolio_snapshot` / `return_ytd`, `active_alpha_ytd` |
-| **Evidence** | 976 rows (144 clients) have `return_ytd` > 1. They are **not** a units error: alpha reconciles exactly using the stored values. They coincide with large AUM jumps (client 29: AUM $9.1K → $52.1K in one month, return −32% → +287%), i.e. deposits being counted as investment return. |
+| **Evidence** | 976 rows (144 clients) have `return_ytd` > 1 in the raw data; one more (`1170.15%`) joins them once D6 converts it, so 977 are flagged. They are **not** a units error: alpha reconciles exactly using the stored values. They coincide with large AUM jumps (client 29: AUM $9.1K → $52.1K in one month, return −32% → +287%), i.e. deposits being counted as investment return. |
 | **Dimension violated** | Accuracy / Plausibility |
 | **Decision** | **Flag**: add `return_suspect` = 1. Keep the values. |
 | **Justification** | The return isn't flow-adjusted. A true time-weighted return needs daily flows and valuations we don't have, so recomputing it would invent data. |
